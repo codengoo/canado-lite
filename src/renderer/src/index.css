@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.draggable {
+  -webkit-app-region: drag;
+}
+
+.no-draggable {
+  -webkit-app-region: no-drag;
+}
+
+@layer utilities {
+  .scrollbar::-webkit-scrollbar {
+    width: 0px;
+  }
+
+  .scrollbar::-webkit-scrollbar-track {
+    border-radius: 99px;
+    opacity: 0;
+  }
+
+  .scrollbar::-webkit-scrollbar-track::hover {
+    opacity: 1;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb {
+    background: #dddddd;
+    border-radius: 99px;
+
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #c0a0b9;
+  }
+}
