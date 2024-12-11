@@ -1,4 +1,4 @@
-import { ENoteState, INote } from '@/types';
+import { ENoteStatus, INote } from '@/types';
 import { createSlice } from '@reduxjs/toolkit';
 import { createNote, fetchNotes, updateNoteState } from '.';
 
@@ -18,20 +18,13 @@ export const noteSlice = createSlice({
   name: 'note',
   initialState,
   reducers: {
-    // increment: state => {
-    //   state.value += 1
-    // },
-    // decrement: state => {
-    //   state.value -= 1
-    // },
-    // // Use the PayloadAction type to declare the contents of `action.payload`
     // incrementByAmount: (state, action: PayloadAction<number>) => {
     //   state.value += action.payload
     // }
   },
   selectors: {
     selectNotes: (state) => {
-      return state.notes.filter((t) => t.state === ENoteState.ON_GOING);
+      return state.notes.filter((t) => t.status === ENoteStatus.ON_GOING);
     },
     selectFetchingNoteStatus: (state) => ({
       loading: state.loading,
@@ -56,12 +49,12 @@ export const noteSlice = createSlice({
     });
     builder.addCase(updateNoteState.fulfilled, (state, action) => {
       state.loading = false;
-      state.notes = state.notes.map((note) =>
-        note.id === action.payload?.id ? action.payload : note,
-      );
+      state.notes = state.notes.map((note) => (note.id === action.payload?.id ? action.payload : note));
     });
 
     builder.addCase(createNote.pending, (state, action) => {
+      console.log(action.meta.arg);
+      
       state.loading = true;
     });
     builder.addCase(createNote.fulfilled, (state, action) => {

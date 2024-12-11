@@ -1,7 +1,7 @@
 import { KeyboardEvent } from 'react';
 import { TbCircleDashedCheck, TbCircleX, TbDotsCircleHorizontal } from 'react-icons/tb';
 import CreationArea from './components/creation_area';
-import Task from './components/task';
+import TaskArea from './components/task_area';
 import { BtnIcon } from './components/ui';
 
 function App(): JSX.Element {
@@ -12,7 +12,7 @@ function App(): JSX.Element {
     if (ev.key == 'Escape') {
       // @ts-ignore
       // ev.target.blur();
-      console.log("errer");
+      console.log('errer');
     }
   };
 
@@ -30,16 +30,7 @@ function App(): JSX.Element {
           />
         </div>
 
-        <div className="scrollbar space-y-2 overflow-y-scroll">
-          <Task />
-          <Task />
-          <Task />
-          <Task />
-          <Task />
-          <Task />
-          <Task />
-          <Task />
-        </div>
+        <TaskArea />
       </div>
 
       <CreationArea />

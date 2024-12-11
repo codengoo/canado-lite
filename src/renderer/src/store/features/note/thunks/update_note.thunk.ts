@@ -1,10 +1,10 @@
-import { ENoteState, INote, IResponseData } from '@/types';
+import { ENoteStatus, INote, IResponseData } from '@/types';
 import { axios } from '@/utils';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
 interface IUpdateStatusNote {
   id: string;
-  status: ENoteState;
+  status: ENoteStatus;
 }
 
 const updateNoteState = createAsyncThunk(

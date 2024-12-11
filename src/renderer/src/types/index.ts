@@ -1,4 +1,4 @@
-export enum ENoteState {
+export enum ENoteStatus {
     ON_GOING = 'ON_GOING',
     COMPLETED = 'COMPLETED',
   }
@@ -6,8 +6,10 @@ export enum ENoteState {
   export interface INote {
     content: string;
     id: string;
+    ref: string;
     title: string;
-    state: ENoteState;
+    status: ENoteStatus;
+    priority: string;
     updateAt: string;
     createdAt: string;
   }
