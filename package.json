@@ -1,12 +1,14 @@
 {
   "name": "canado-lite",
   "version": "1.0.0",
-  "description": "An Electron application with React and TypeScript",
+  "description": "Todo list",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "author": {
+    "name": "NghiaDT",
+    "email": "nghiadt22.work@gmail.com"
+  },
   "scripts": {
-    "build": "npm run typecheck && electron-vite build",
+    "build": "electron-vite build",
     "build:linux": "electron-vite build && electron-builder --linux",
     "build:mac": "electron-vite build && electron-builder --mac",
     "build:unpack": "npm run build && electron-builder --dir",

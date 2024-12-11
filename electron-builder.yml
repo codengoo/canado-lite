@@ -1,4 +1,4 @@
-appId: com.electron.app
+appId: com.canadoo.canado
 productName: canado-lite
 directories:
   buildResources: build
@@ -12,6 +12,7 @@ files:
 asarUnpack:
   - resources/**
 win:
+  icon: resources/icon.ico
   executableName: canado-lite
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
