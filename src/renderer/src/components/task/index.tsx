@@ -1,16 +1,46 @@
-import { TbCircleArrowDownFilled, TbSquareRoundedCheck } from 'react-icons/tb'
-import { BtnIcon } from '../ui'
+import { ENotePriority, INote } from '@/types';
+import {
+  TbAlertCircleFilled,
+  TbCircleArrowDownFilled,
+  TbCircleArrowUpFilled,
+  TbSquareRoundedCheck,
+} from 'react-icons/tb';
+import { BtnIcon } from '../ui';
 
-export default function Task() {
+interface ITaskProps {
+  data: INote;
+}
+
+export default function Task({ data }: ITaskProps) {
   return (
-    <div className="bg-gray-100/80 w-full rounded-lg p-4 hover:bg-white transition-all cursor-pointer flex gap-4 items-center border-2 border-transparent hover:hover:border-green-600 hover:shadow-xl group">
-      <BtnIcon icon={TbCircleArrowDownFilled} iconClassName="text-green-600" />
-      <h1 className="flex-grow">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,</h1>
+    <div
+      className={
+        'group flex w-full cursor-pointer items-center gap-4 rounded-lg border-2 border-transparent bg-gray-100/80 p-4 transition-all hover:bg-white hover:shadow-xl ' +
+        (data.priority === ENotePriority.LOW
+          ? 'hover:hover:border-green-600'
+          : data.priority === ENotePriority.HIGH
+            ? 'hover:border-red-600'
+            : 'hover:border-yellow-600')
+      }
+    >
+      {data.priority === ENotePriority.LOW ? (
+        <BtnIcon icon={TbCircleArrowDownFilled} iconClassName="text-green-600" />
+      ) : data.priority === ENotePriority.HIGH ? (
+        <BtnIcon icon={TbAlertCircleFilled} iconClassName="text-red-600" />
+      ) : (
+        <BtnIcon icon={TbCircleArrowUpFilled} iconClassName="text-yellow-600" />
+      )}
+
+      <div className="flex-grow">
+        <h1 className="font-semibold">{data.title}</h1>
+        <p className="text-sm">{data.content}</p>
+      </div>
+      
       <BtnIcon
         icon={TbSquareRoundedCheck}
-        className="opacity-0 group-hover:opacity-100 self-start"
+        className="self-start opacity-0 group-hover:opacity-100"
         iconClassName="text-gray-400"
       />
     </div>
-  )
+  );
 }

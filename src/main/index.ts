@@ -2,6 +2,7 @@ import { is, optimizer } from '@electron-toolkit/utils';
 import { app, BrowserWindow, globalShortcut, ipcMain, nativeImage, shell } from 'electron';
 import { join } from 'path';
 import appIcon from '../../resources/icon.ico?asset';
+import { createNotif, INotifPayload } from './notification';
 
 var windows: BrowserWindow | null = null;
 
@@ -18,7 +19,6 @@ function createWindow(): void {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
-      transparent: true,
     },
   });
 
@@ -31,11 +31,14 @@ function createWindow(): void {
     return { action: 'deny' };
   });
 
-  const success = globalShortcut.register('CmdOrCtrl+Alt+Z', () => {
-    if (!windows?.isVisible()) windows?.show();
+  globalShortcut.register('CmdOrCtrl+Alt+Z', () => {
+    if (!windows?.isVisible()) {
+      windows?.show();
+      setTimeout(() => {
+        windows?.setPosition(300, 300);
+      }, 100);
+    }
   });
-
-  console.log(success);
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     windows.loadURL(process.env['ELECTRON_RENDERER_URL']);
@@ -57,7 +60,7 @@ app.on('will-quit', () => {
 const gotTheLock = app.requestSingleInstanceLock();
 
 if (process.platform === 'win32') {
-  app.setAppUserModelId("Canado");
+  app.setAppUserModelId('Canado');
 }
 
 if (!gotTheLock) {
@@ -89,8 +92,11 @@ if (!gotTheLock) {
   });
 
   ipcMain.on('hide-win', () => {
-    console.log('receive');
-
     windows?.hide();
+    windows?.setPosition(0, -1000);
+  });
+
+  ipcMain.on('show-notif', (_, payload: INotifPayload) => {
+    createNotif(payload);
   });
 }

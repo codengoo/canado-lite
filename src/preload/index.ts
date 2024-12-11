@@ -1,9 +1,11 @@
 import { electronAPI } from '@electron-toolkit/preload';
 import { contextBridge, ipcRenderer } from 'electron';
+import { INotifPayload } from '../main/notification';
 
 const api = {
   closeWindows: () => ipcRenderer.send('close-win'),
   hideWindows: () => ipcRenderer.send('hide-win'),
+  showNotif: (payload: INotifPayload) => ipcRenderer.send('show-notif', payload),
 };
 
 if (process.contextIsolated) {
