@@ -35,7 +35,7 @@ export default function Task({ data }: ITaskProps) {
         <h1 className="font-semibold">{data.title}</h1>
         <p className="text-sm">{data.content}</p>
       </div>
-      
+
       <BtnIcon
         icon={TbSquareRoundedCheck}
         className="self-start opacity-0 group-hover:opacity-100"

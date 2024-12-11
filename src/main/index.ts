@@ -7,10 +7,9 @@ import { createNotif, INotifPayload } from './notification';
 var windows: BrowserWindow | null = null;
 
 function createWindow(): void {
-  // Create the browser window.
   windows = new BrowserWindow({
     width: 600,
-    height: 600,
+    height: 400,
     icon: nativeImage.createFromPath(appIcon),
     autoHideMenuBar: true,
     titleBarStyle: 'hidden',

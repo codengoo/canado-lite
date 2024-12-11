@@ -5,7 +5,7 @@ import { AxiosError } from 'axios';
 
 export const fetchNotes = createAsyncThunk('note/fetchAll', async (_, { rejectWithValue }) => {
   try {
-    const response = await axios.get(`/note__?status=${ENoteStatus.ON_GOING}`);
+    const response = await axios.get(`/note?status=${ENoteStatus.ON_GOING}`);
     const res = response.data as IResponseData<INote[]>;
 
     if (res.data) return res.data;
