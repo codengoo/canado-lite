@@ -1,23 +1,37 @@
-import { ENoteStatus, INote, IResponseData } from '@/types';
+import { ENotePriority, ENoteStatus, INote, IResponseData } from '@/types';
 import { axios } from '@/utils';
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { AxiosError } from 'axios';
 
-interface IUpdateStatusNote {
+interface IUpdateNotePayload {
   id: string;
-  status: ENoteStatus;
+  status?: ENoteStatus;
+  folderId?: string;
+  priority?: ENotePriority;
 }
 
-const updateNoteState = createAsyncThunk(
+export const updateNote = createAsyncThunk(
   'note/updateNoteState',
-  async (body: IUpdateStatusNote) => {
-    const response = await axios.put(`/note/${body.id}`, {
-      status: body.status,
-    });
+  async (payload: IUpdateNotePayload, { rejectWithValue }) => {
+    try {
+      const { id, ...dataToSend } = payload;
+      const response = await axios.put(`/note/${payload.id}`, dataToSend);
 
-    const res = response.data as IResponseData<INote>;
-    if (res.data) return res.data;
-    else return;
+      const res = response.data as IResponseData<INote>;
+      if (!res.data && res.message) throw new Error(res.message);
+      else return res.data!;
+    } catch (error) {
+      if (error instanceof AxiosError || error instanceof Error) {
+        return rejectWithValue({
+          title: 'Cannot update note with id: ' + payload.id,
+          body: error.message,
+        });
+      } else {
+        return rejectWithValue({
+          title: 'Cannot update note with id: ' + payload.id,
+          body: 'Unknow error',
+        });
+      }
+    }
   },
 );
-
-export default updateNoteState;

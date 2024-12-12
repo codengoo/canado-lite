@@ -1,12 +1,12 @@
 import { ENotePriority, ENoteStatus, IError, INote } from '@/types';
 import { createSlice } from '@reduxjs/toolkit';
 import { v4 as uuid } from 'uuid';
-import { createNote, fetchNotes, updateNoteState } from '.';
+import { createNote, fetchNotes, updateNote } from '.';
 
 export interface NoteState {
   notes: INote[];
   loading: boolean;
-  currentAction: 'create' | 'fetch' | 'delete' | 'none';
+  currentAction: 'create' | 'fetch' | 'update' | 'none';
   errors: IError[];
 }
 
@@ -78,12 +78,27 @@ export const noteSlice = createSlice({
      *
      */
 
-    builder.addCase(updateNoteState.pending, (state, action) => {
+    builder.addCase(updateNote.pending, (state, action) => {
       state.loading = true;
+      state.errors = [];
+      state.currentAction = 'update';
+
+      // const ref = value.ref;
+      // TODO: Fix later
+      // const idx = state.notes.findLastIndex((note) => note.ref == ref);
+      const idx = state.notes.length - 1;
+      if (idx >= 0) state.notes[idx].isLoading = true;
     });
-    builder.addCase(updateNoteState.fulfilled, (state, action) => {
+    builder.addCase(updateNote.fulfilled, (state, action) => {
       state.loading = false;
       state.notes = state.notes.map((note) => (note.id === action.payload?.id ? action.payload : note));
+    });
+    builder.addCase(updateNote.rejected, (state, action) => {
+      state.loading = false;
+      state.currentAction = 'none';
+
+      const msg = action.payload || { title: 'Fetch notes failed', body: action.error.message };
+      state.errors = [msg as IError];
     });
 
     /**
@@ -135,6 +150,12 @@ export const noteSlice = createSlice({
 
       const msg = action.payload || { title: 'Fetch notes failed', body: action.error.message };
       state.errors = [msg as IError];
+
+      // const ref = value.ref;
+      // TODO: Fix later
+      // const idx = state.notes.findLastIndex((note) => note.ref == ref);
+      const idx = state.notes.length - 1;
+      if (idx >= 0) state.notes.splice(idx, 1);
     });
   },
 });

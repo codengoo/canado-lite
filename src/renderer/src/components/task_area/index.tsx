@@ -36,7 +36,7 @@ export default function TaskArea() {
           <p className="animate-pulse font-semibold text-gray-700">Fetching data from server, please wait...</p>
         </div>
       ) : (
-        notes.map((note) => <Task data={note} />)
+        notes.map((note) => <Task data={note} key={'task_' + note.id} />)
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 import { useAppDispatch } from '@/hooks';
 import { createNote } from '@/store/features/note';
-import { KeyboardEvent, useEffect, useRef } from 'react';
+import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { TbGrain, TbSend2 } from 'react-icons/tb';
 import { BtnIcon } from '../ui';
 
@@ -8,9 +8,12 @@ export default function CreationArea() {
   const hideApp = () => window.api.hideWindows();
   const inputRef = useRef<HTMLInputElement>(null);
   const dispatch = useAppDispatch();
+  const [isDisableSendbtn, setDisableSendBtn] = useState<boolean>(true);
 
   const handleKeyUp = (ev: KeyboardEvent<HTMLInputElement>) => {
     ev.stopPropagation();
+    if (ev.currentTarget.value.trim().length === 0) setDisableSendBtn(true);
+    else if (ev.currentTarget.value.trim().length !== 0 && isDisableSendbtn) setDisableSendBtn(false);
 
     if (ev.key == 'Escape') {
       ev.currentTarget.value = '';
@@ -18,6 +21,8 @@ export default function CreationArea() {
       hideApp();
     } else if (ev.key === 'Enter') {
       const value = ev.currentTarget.value;
+      if (value.trim().length === 0) return;
+
       ev.currentTarget.value = '';
 
       dispatch(
@@ -44,7 +49,7 @@ export default function CreationArea() {
           className="no-draggable flex-grow bg-transparent font-semibold outline-none placeholder:font-normal placeholder:text-gray-500"
           onKeyUp={handleKeyUp}
         />
-        <BtnIcon icon={TbSend2} />
+        <BtnIcon icon={TbSend2} disable={isDisableSendbtn} />
       </div>
     </div>
   );

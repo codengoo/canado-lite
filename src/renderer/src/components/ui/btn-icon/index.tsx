@@ -5,11 +5,20 @@ interface IBtnIconProps {
   className?: string;
   iconClassName?: string;
   onClick?: () => void;
+  disable?: boolean;
 }
 
-export function BtnIcon({ icon: Icon, className = '', iconClassName = '', onClick }: IBtnIconProps) {
+export function BtnIcon({ icon: Icon, className = '', iconClassName = '', onClick, disable }: IBtnIconProps) {
   return (
-    <button className={'flex-none rounded-md p-1 transition-all hover:bg-gray-400/20 ' + className} onClick={onClick}>
+    <button
+      disabled={disable}
+      className={
+        'flex-none cursor-pointer rounded-md p-1 transition-all hover:bg-gray-400/20 ' +
+        (disable ? 'opacity-50 ' : 'opacity-100 ') +
+        className
+      }
+      onClick={onClick}
+    >
       <Icon className={'text-gray-600 ' + iconClassName} size={24} />
     </button>
   );
