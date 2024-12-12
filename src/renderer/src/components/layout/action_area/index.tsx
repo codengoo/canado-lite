@@ -46,14 +46,27 @@ export default function ActionArea() {
         iconClassName={loading && currentAction == 'fetch' ? 'animate-spin' : ''}
         onClick={handleRefresh}
         size={18}
+        tooltip="Refresh data"
       />
-      <BtnIcon icon={TbCircleDashedCheck} className="bg-slate-100/80 hover:bg-slate-100" size={18} />
-      <BtnIcon icon={TbLayout} className="bg-slate-100/80 hover:bg-slate-100" size={18} onClick={handleChangeLayout} />
+      <BtnIcon
+        icon={TbCircleDashedCheck}
+        className="bg-slate-100/80 hover:bg-slate-100"
+        size={18}
+        tooltip="View finished task"
+      />
+      <BtnIcon
+        icon={TbLayout}
+        className="bg-slate-100/80 hover:bg-slate-100"
+        size={18}
+        onClick={handleChangeLayout}
+        tooltip="Change layout"
+      />
       <BtnIcon
         icon={TbPointerBolt}
         className="bg-slate-100/80 hover:bg-slate-100"
         size={18}
         onClick={handleChangeStartUpMode}
+        tooltip="Start up with windows"
       />
       {/* <BtnIcon icon={TbSettings} className="bg-slate-100/80 hover:bg-slate-100" /> */}
       <BtnIcon
@@ -62,6 +75,7 @@ export default function ActionArea() {
         iconClassName="text-red-500"
         onClick={closeApp}
         size={18}
+        tooltip="Close windows"
       />
     </div>
   );
