@@ -1,5 +1,5 @@
 import { is, optimizer } from '@electron-toolkit/utils';
-import { app, BrowserWindow, globalShortcut, ipcMain, nativeImage, screen, shell } from 'electron';
+import { app, BrowserWindow, globalShortcut, ipcMain, nativeImage, shell } from 'electron';
 import { join } from 'path';
 import appIcon from '../../resources/icon.ico?asset';
 import { IWindowPositionType } from '../types';
@@ -10,68 +10,9 @@ import './ipcs/notif.ipc';
 import './ipcs/register.ipc';
 import './ipcs/storage.ipc';
 
-function calcPos(windows: BrowserWindow, position: IWindowPositionType) {
-  const primaryScreen = screen.getPrimaryDisplay();
-  const { width: screenWidth, height: screenHeight } = primaryScreen.workAreaSize;
-
-  const windowWidth = windows.getSize()[0] || 100;
-  const windowHeight = windows.getSize()[1] || 100;
-
-  switch (position) {
-    case 'center-bottom':
-      return {
-        x: Math.floor((screenWidth - windowWidth) / 2),
-        y: screenHeight - windowHeight,
-      };
-
-    case 'center-top':
-      return {
-        x: Math.floor((screenWidth - windowWidth) / 2),
-        y: 0,
-      };
-
-    case 'center-center':
-      return {
-        x: Math.floor((screenWidth - windowWidth) / 2),
-        y: Math.floor((screenHeight - windowHeight) / 2),
-      };
-
-    default:
-      return { x: 0, y: 0 };
-  }
-}
-
-async function readLayoutSetting(): Promise<IWindowPositionType> {
-  try {
-    const storage = Storage.getInstance();
-    const raw = (await storage.getItem('persist__root')) as string;
-    const root = JSON.parse(raw);
-    const setting = root ? JSON.parse(root.setting) : null;
-
-    return (setting ? setting.layout : 'center-bottom') as IWindowPositionType;
-  } catch (error) {
-    console.log(error);
-    return 'center-bottom';
-  }
-}
-
-async function showWindows(windows: BrowserWindow, first?: boolean) {
-  const layout = await readLayoutSetting();
-
-  const { x, y } = calcPos(windows, layout);
-
-  if (first) {
-    windows.setPosition(x, y);
-    windows.show();
-  } else if (!windows.isVisible()) {
-    windows.show();
-
-    setTimeout(() => {
-      windows.setPosition(x, y);
-      windows.webContents.send('show-win');
-    }, 100);
-  }
-}
+import { calcPos, showWindows } from './modules';
+import './modules/tray';
+import { createTrayInstance } from './modules/tray';
 
 function createWindow(): void {
   windows = new BrowserWindow({
@@ -137,6 +78,7 @@ if (!gotTheLock) {
   app.on('ready', () => {
     Storage.getInstance();
     createWindow();
+    createTrayInstance(windows!);
   });
 
   app.on('activate', () => {
@@ -149,13 +91,13 @@ if (!gotTheLock) {
     optimizer.watchWindowShortcuts(window);
   });
 
-  ipcMain.on('close-win', () => {
-    app.quit();
-  });
-
   ipcMain.on('hide-win', () => {
     windows?.hide();
     windows?.setPosition(0, -1000);
+  });
+
+  ipcMain.on('close-win', () => {
+    app.quit();
   });
 
   ipcMain.on('change-layout', (_, payload: IWindowPositionType) => {
@@ -164,5 +106,5 @@ if (!gotTheLock) {
   });
 
   console.log(app.getAppPath());
-  console.log(app.getPath("exe"));
+  console.log(app.getPath('exe'));
 }
