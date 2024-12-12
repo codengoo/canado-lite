@@ -12,7 +12,14 @@ export const fetchNotes = createAsyncThunk('note/fetchAll', async (_, { rejectWi
     else return [];
   } catch (error) {
     if (error instanceof AxiosError || error instanceof Error) {
-      return rejectWithValue(error.message);
-    } else return rejectWithValue('Unknown error');
+      return rejectWithValue({
+        title: 'Cannot fetch notes',
+        body: error.message,
+      });
+    } else
+      return rejectWithValue({
+        title: 'Cannot fetch notes',
+        bode: 'Unknown error',
+      });
   }
 });

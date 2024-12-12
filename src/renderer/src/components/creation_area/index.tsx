@@ -1,3 +1,5 @@
+import { useAppDispatch } from '@/hooks';
+import { createNote } from '@/store/features/note';
 import { KeyboardEvent, useEffect, useRef } from 'react';
 import { TbGrain, TbSend2 } from 'react-icons/tb';
 import { BtnIcon } from '../ui';
@@ -5,16 +7,25 @@ import { BtnIcon } from '../ui';
 export default function CreationArea() {
   const hideApp = () => window.api.hideWindows();
   const inputRef = useRef<HTMLInputElement>(null);
+  const dispatch = useAppDispatch();
 
   const handleKeyUp = (ev: KeyboardEvent<HTMLInputElement>) => {
     ev.stopPropagation();
 
     if (ev.key == 'Escape') {
-      // @ts-ignore
-      ev.target.value = '';
-      // @ts-ignore
-      ev.target.blur();
+      ev.currentTarget.value = '';
+      ev.currentTarget.blur();
       hideApp();
+    } else if (ev.key === 'Enter') {
+      const value = ev.currentTarget.value;
+      ev.currentTarget.value = '';
+
+      dispatch(
+        createNote({
+          title: value,
+          content: value,
+        }),
+      );
     }
   };
 

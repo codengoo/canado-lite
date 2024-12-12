@@ -1,16 +1,19 @@
-import { ENotePriority, ENoteStatus, INote } from '@/types';
+import { ENotePriority, ENoteStatus, IError, INote } from '@/types';
 import { createSlice } from '@reduxjs/toolkit';
+import { v4 as uuid } from 'uuid';
 import { createNote, fetchNotes, updateNoteState } from '.';
 
 export interface NoteState {
   notes: INote[];
   loading: boolean;
-  errors: string[];
+  currentAction: 'create' | 'fetch' | 'delete' | 'none';
+  errors: IError[];
 }
 
 const initialState: NoteState = {
   notes: [],
   loading: false,
+  currentAction: 'none',
   errors: [],
 };
 
@@ -30,6 +33,7 @@ export const noteSlice = createSlice({
     selectFetchingNoteStatus: (state) => ({
       loading: state.loading,
       errors: state.errors,
+      currentAction: state.currentAction,
     }),
   },
 
@@ -42,10 +46,14 @@ export const noteSlice = createSlice({
     builder.addCase(fetchNotes.pending, (state) => {
       state.loading = true;
       state.errors = [];
+      state.currentAction = 'fetch';
     });
     builder.addCase(fetchNotes.fulfilled, (state, action) => {
       state.loading = false;
       state.errors = [];
+      state.currentAction = 'none';
+
+      // Fix later
       state.notes = action.payload.map((value) => ({
         title: value.title,
         content: value.content,
@@ -59,8 +67,10 @@ export const noteSlice = createSlice({
     });
     builder.addCase(fetchNotes.rejected, (state, action) => {
       state.loading = false;
-      const msg = action.payload || action.error.message;
-      state.errors = [msg as string];
+      state.currentAction = 'none';
+
+      const msg = action.payload || { title: 'Fetch notes failed', body: action.error.message };
+      state.errors = [msg as IError];
     });
 
     /**
@@ -81,13 +91,50 @@ export const noteSlice = createSlice({
      *
      */
     builder.addCase(createNote.pending, (state, action) => {
-      console.log(action.meta.arg);
-
       state.loading = true;
+      state.currentAction = 'create';
+      const payload = action.meta.arg;
+      const newNote: INote = {
+        title: payload.title,
+        content: payload.content,
+        folderId: '0000',
+        id: '0000',
+        priority: ENotePriority.LOW,
+        ref: uuid(),
+        status: ENoteStatus.ON_GOING,
+        isLoading: true,
+      };
+
+      state.notes = [...state.notes, newNote];
     });
     builder.addCase(createNote.fulfilled, (state, action) => {
       state.loading = false;
-      state.notes = [...state.notes, action.payload!];
+      state.currentAction = 'none';
+      const value = action.payload;
+      // const ref = value.ref;
+      // TODO: Fix later
+      // const idx = state.notes.findLastIndex((note) => note.ref == ref);
+      const idx = state.notes.length - 1;
+
+      if (idx >= 0)
+        state.notes[idx] = {
+          title: value.title,
+          content: value.content,
+          id: value.id,
+          ref: value.ref,
+          // @ts-ignore
+          status: value.state,
+          folderId: '0000',
+          priority: ENotePriority.LOW,
+          isLoading: false,
+        };
+    });
+    builder.addCase(createNote.rejected, (state, action) => {
+      state.loading = false;
+      state.currentAction = 'none';
+
+      const msg = action.payload || { title: 'Fetch notes failed', body: action.error.message };
+      state.errors = [msg as IError];
     });
   },
 });

@@ -3,6 +3,7 @@ import {
   TbAlertCircleFilled,
   TbCircleArrowDownFilled,
   TbCircleArrowUpFilled,
+  TbLoader2,
   TbSquareRoundedCheck,
 } from 'react-icons/tb';
 import { BtnIcon } from '../ui';
@@ -23,7 +24,9 @@ export default function Task({ data }: ITaskProps) {
             : 'hover:border-yellow-600')
       }
     >
-      {data.priority === ENotePriority.LOW ? (
+      {data.isLoading ? (
+        <TbLoader2 className="animate-spin text-gray-500" size={24} />
+      ) : data.priority === ENotePriority.LOW ? (
         <BtnIcon icon={TbCircleArrowDownFilled} iconClassName="text-green-600" />
       ) : data.priority === ENotePriority.HIGH ? (
         <BtnIcon icon={TbAlertCircleFilled} iconClassName="text-red-600" />

@@ -8,7 +8,7 @@ export default function TaskArea() {
   const showNotif = window.api.showNotif;
   const dispatch = useAppDispatch();
   const notes = useAppSelector(selectNotes);
-  const { loading, errors } = useAppSelector(selectFetchingNoteStatus);
+  const { loading, errors, currentAction } = useAppSelector(selectFetchingNoteStatus);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -18,8 +18,8 @@ export default function TaskArea() {
   useEffect(() => {
     if (!loading && errors.length > 0) {
       showNotif({
-        title: 'Fetch data failed',
-        body: errors[0],
+        title: errors[0].title,
+        body: errors[0].body,
       });
     }
   }, [loading]);
@@ -30,7 +30,7 @@ export default function TaskArea() {
 
   return (
     <div className="scrollbar space-y-2 overflow-y-scroll rounded-lg" ref={containerRef}>
-      {loading ? (
+      {loading && currentAction === 'fetch' && notes.length === 0 ? (
         <div className="flex items-center gap-2">
           <TbLoader2 className="animate-spin text-gray-500" size={24} />
           <p className="animate-pulse font-semibold text-gray-700">Fetching data from server, please wait...</p>

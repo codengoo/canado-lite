@@ -19,6 +19,7 @@ export interface INote {
   folderId: string;
   updatedAt?: Date;
   createdAt?: Date;
+  isLoading?: boolean;
 }
 
 export interface IResponseData<T = any> {
@@ -34,4 +35,9 @@ export interface IUser {
   email: string;
   displayName: string;
   avatar: string;
+}
+
+export interface IError{
+  title: string,
+  body: string
 }
