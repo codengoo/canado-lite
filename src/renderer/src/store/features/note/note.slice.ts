@@ -27,7 +27,8 @@ export const noteSlice = createSlice({
   },
   selectors: {
     selectNotes: (state) => {
-      return state.notes.filter((t) => t.status === ENoteStatus.ON_GOING);
+      // return state.notes.filter((t) => t.status === ENoteStatus.ON_GOING);
+      return state.notes;
     },
 
     selectFetchingNoteStatus: (state) => ({
@@ -83,15 +84,31 @@ export const noteSlice = createSlice({
       state.errors = [];
       state.currentAction = 'update';
 
-      // const ref = value.ref;
-      // TODO: Fix later
-      // const idx = state.notes.findLastIndex((note) => note.ref == ref);
-      const idx = state.notes.length - 1;
+      const ref = action.meta.arg.id;
+      const idx = state.notes.findLastIndex((note) => note.id == ref);
       if (idx >= 0) state.notes[idx].isLoading = true;
     });
     builder.addCase(updateNote.fulfilled, (state, action) => {
       state.loading = false;
-      state.notes = state.notes.map((note) => (note.id === action.payload?.id ? action.payload : note));
+      state.currentAction = 'none';
+      const value = action.payload;
+      const ref = value.id;
+      const idx = state.notes.findLastIndex((note) => note.id == ref);
+
+      if (idx >= 0)
+        state.notes[idx] = {
+          title: value.title,
+          content: value.content,
+          id: value.id,
+          ref: value.ref,
+          // @ts-ignore
+          status: value.state,
+          folderId: '0000',
+          priority: ENotePriority.LOW,
+          isLoading: false,
+        };
+
+      console.log(state.notes[idx]);
     });
     builder.addCase(updateNote.rejected, (state, action) => {
       state.loading = false;

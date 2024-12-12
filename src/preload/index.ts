@@ -6,6 +6,8 @@ const api = {
   closeWindows: () => ipcRenderer.send('close-win'),
   hideWindows: () => ipcRenderer.send('hide-win'),
   showNotif: (payload: INotifPayload) => ipcRenderer.send('show-notif', payload),
+
+  onShowWindow: (callback: () => void) => ipcRenderer.on('show-win', () => callback()),
 };
 
 if (process.contextIsolated) {

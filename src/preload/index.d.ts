@@ -8,6 +8,8 @@ declare global {
       closeWindows: () => void;
       hideWindows: () => void;
       showNotif: (payload: INotifPayload) => void;
+
+      onShowWindow: (callback: () => void) => void;
     };
   }
 }

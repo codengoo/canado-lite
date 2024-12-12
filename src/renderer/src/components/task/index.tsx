@@ -1,10 +1,13 @@
-import { ENotePriority, INote } from '@/types';
+import { useAppDispatch } from '@/hooks';
+import { updateNote } from '@/store/features/note';
+import { ENotePriority, ENoteStatus, INote } from '@/types';
 import {
   TbAlertCircleFilled,
   TbCircleArrowDownFilled,
   TbCircleArrowUpFilled,
   TbLoader2,
   TbSquareRoundedCheck,
+  TbSquareRoundedCheckFilled,
 } from 'react-icons/tb';
 import { BtnIcon } from '../ui';
 
@@ -13,6 +16,17 @@ interface ITaskProps {
 }
 
 export default function Task({ data }: ITaskProps) {
+  const dispatch = useAppDispatch();
+
+  const updateDoneStatus = (status: ENoteStatus) => {
+    dispatch(
+      updateNote({
+        id: data.id,
+        status: status,
+      }),
+    );
+  };
+
   return (
     <div
       className={
@@ -25,7 +39,9 @@ export default function Task({ data }: ITaskProps) {
       }
     >
       {data.isLoading ? (
-        <TbLoader2 className="animate-spin text-gray-500" size={24} />
+        <div className="p-1">
+          <TbLoader2 className="animate-spin text-gray-500" size={24} />
+        </div>
       ) : data.priority === ENotePriority.LOW ? (
         <BtnIcon icon={TbCircleArrowDownFilled} iconClassName="text-green-600" />
       ) : data.priority === ENotePriority.HIGH ? (
@@ -39,11 +55,21 @@ export default function Task({ data }: ITaskProps) {
         <p className="text-sm">{data.content}</p>
       </div>
 
-      <BtnIcon
-        icon={TbSquareRoundedCheck}
-        className="self-start opacity-0 group-hover:opacity-100"
-        iconClassName="text-gray-400"
-      />
+      {data.status === ENoteStatus.ON_GOING ? (
+        <BtnIcon
+          icon={TbSquareRoundedCheck}
+          className="self-start opacity-0 group-hover:opacity-100"
+          iconClassName="text-gray-400"
+          onClick={() => updateDoneStatus(ENoteStatus.COMPLETED)}
+        />
+      ) : (
+        <BtnIcon
+          icon={TbSquareRoundedCheckFilled}
+          className="self-start opacity-0 group-hover:opacity-100"
+          iconClassName="text-green-600"
+          onClick={() => updateDoneStatus(ENoteStatus.ON_GOING)}
+        />
+      )}
     </div>
   );
 }

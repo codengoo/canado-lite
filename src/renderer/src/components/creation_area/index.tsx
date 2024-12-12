@@ -36,6 +36,7 @@ export default function CreationArea() {
 
   useEffect(() => {
     inputRef?.current?.focus();
+    window.api.onShowWindow(() => inputRef?.current?.focus());
   }, []);
 
   return (

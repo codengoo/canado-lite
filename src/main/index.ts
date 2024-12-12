@@ -1,10 +1,39 @@
 import { is, optimizer } from '@electron-toolkit/utils';
-import { app, BrowserWindow, globalShortcut, ipcMain, nativeImage, shell } from 'electron';
+import { app, BrowserWindow, globalShortcut, ipcMain, nativeImage, screen, shell } from 'electron';
 import { join } from 'path';
 import appIcon from '../../resources/icon.ico?asset';
 import { createNotif, INotifPayload } from './notification';
 
 var windows: BrowserWindow | null = null;
+
+function calcPos(windows: BrowserWindow) {
+  const primaryScreen = screen.getPrimaryDisplay();
+  const { width: screenWidth, height: screenHeight } = primaryScreen.workAreaSize;
+
+  const windowWidth = windows.getSize()[0] || 100;
+  const windowHeight = windows.getSize()[1] || 100;
+
+  const x = Math.floor((screenWidth - windowWidth) / 2);
+  const y = screenHeight - windowHeight;
+
+  return { x, y };
+}
+
+function showWindows(windows: BrowserWindow, first?: boolean) {
+  if (first) {
+    const { x, y } = calcPos(windows);
+    windows.setPosition(x, y);
+    windows.show();
+  } else if (!windows.isVisible()) {
+    windows.show();
+
+    setTimeout(() => {
+      const { x, y } = calcPos(windows);
+      windows.setPosition(x, y);
+      windows.webContents.send('show-win');
+    }, 100);
+  }
+}
 
 function createWindow(): void {
   windows = new BrowserWindow({
@@ -21,22 +50,17 @@ function createWindow(): void {
     },
   });
 
-  windows.on('ready-to-show', () => {
-    windows?.show();
-  });
-
   windows.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url);
     return { action: 'deny' };
   });
 
+  windows.on('ready-to-show', () => {
+    showWindows(windows!, true);
+  });
+
   globalShortcut.register('CmdOrCtrl+Alt+Z', () => {
-    if (!windows?.isVisible()) {
-      windows?.show();
-      setTimeout(() => {
-        windows?.setPosition(300, 300);
-      }, 100);
-    }
+    showWindows(windows!);
   });
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
