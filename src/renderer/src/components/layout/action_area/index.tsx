@@ -15,8 +15,13 @@ export default function ActionArea() {
   }
 
   function handleChangeLayout() {
-    if (layout === 'center-bottom') dispatch(changeLayout('center-top'));
-    else dispatch(changeLayout('center-bottom'));
+    if (layout === 'center-bottom') {
+      dispatch(changeLayout('center-top'));
+      window.api.changeLayout('center-top');
+    } else {
+      dispatch(changeLayout('center-bottom'));
+      window.api.changeLayout('center-bottom');
+    }
   }
 
   return (

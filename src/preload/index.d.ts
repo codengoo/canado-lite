@@ -8,6 +8,7 @@ declare global {
       closeWindows: () => void;
       hideWindows: () => void;
       showNotif: (payload: INotifPayload) => void;
+      changeLayout: (payload: WindowPositionType) => void;
 
       setStorage: (key: string, value: object) => Promise<boolean>;
       getStorage: <T>(key: string) => Promise<T | null>;

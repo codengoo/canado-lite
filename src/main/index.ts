@@ -2,14 +2,12 @@ import { is, optimizer } from '@electron-toolkit/utils';
 import { app, BrowserWindow, globalShortcut, ipcMain, nativeImage, screen, shell } from 'electron';
 import { join } from 'path';
 import appIcon from '../../resources/icon.ico?asset';
+import { IWindowPositionType } from '../types';
 import { createNotif, INotifPayload } from './notification';
 import { Storage } from './storage';
-
 var windows: BrowserWindow | null = null;
 
-type WindowPositionType = 'center-bottom' | 'center-top';
-
-function calcPos(windows: BrowserWindow, position: WindowPositionType) {
+function calcPos(windows: BrowserWindow, position: IWindowPositionType) {
   const primaryScreen = screen.getPrimaryDisplay();
   const { width: screenWidth, height: screenHeight } = primaryScreen.workAreaSize;
 
@@ -34,8 +32,25 @@ function calcPos(windows: BrowserWindow, position: WindowPositionType) {
   }
 }
 
-function showWindows(windows: BrowserWindow, first?: boolean) {
-  const { x, y } = calcPos(windows, 'center-top');
+async function readLayoutSetting(): Promise<IWindowPositionType> {
+  try {
+    const storage = Storage.getInstance();
+    const raw = (await storage.getItem('persist__root')) as string;
+    const root = JSON.parse(raw);
+    const setting = root ? JSON.parse(root.setting) : null;
+
+    return (setting ? setting.layout : 'center-bottom') as IWindowPositionType;
+  } catch (error) {
+    console.log(error);
+    return 'center-bottom';
+  }
+}
+
+async function showWindows(windows: BrowserWindow, first?: boolean) {
+  const layout = await readLayoutSetting();
+  console.log(layout);
+
+  const { x, y } = calcPos(windows, layout);
 
   if (first) {
     windows.setPosition(x, y);
@@ -137,6 +152,11 @@ if (!gotTheLock) {
 
   ipcMain.on('show-notif', (_, payload: INotifPayload) => {
     createNotif(payload);
+  });
+
+  ipcMain.on('change-layout', (_, payload: IWindowPositionType) => {
+    const { x, y } = calcPos(windows!, payload);
+    windows?.setPosition(x, y);
   });
 
   ipcMain.handle('storage:set', (_, key: string, value: object) => {
