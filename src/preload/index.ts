@@ -7,6 +7,10 @@ const api = {
   hideWindows: () => ipcRenderer.send('hide-win'),
   showNotif: (payload: INotifPayload) => ipcRenderer.send('show-notif', payload),
 
+  setStorage: (key: string, value: object) => ipcRenderer.invoke('storage:set', key, value),
+  getStorage: (key: string) => ipcRenderer.invoke('storage:get', key),
+  removeStorage: (key: string) => ipcRenderer.invoke('storage:remove', key),
+
   onShowWindow: (callback: () => void) => ipcRenderer.on('show-win', () => callback()),
 };
 

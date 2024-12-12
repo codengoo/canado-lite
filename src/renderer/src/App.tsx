@@ -1,15 +1,18 @@
 import { KeyboardEvent, useEffect } from 'react';
-import ActionArea from './components/action_area';
-import CreationArea from './components/creation_area';
-import TaskArea from './components/task_area';
+import ActionArea from './components/layout/action_area';
+import CreationArea from './components/layout/creation_area';
+import FolderArea from './components/layout/folder_area';
+import TaskArea from './components/layout/task_area';
 import { useAppSelector } from './hooks';
 import { selectFetchingNoteStatus } from './store/features/note';
+import { selectSetting } from './store/features/setting';
 
 function App(): JSX.Element {
   const showNotif = window.api.showNotif;
   const hideApp = () => window.api.hideWindows();
 
   const { loading, errors } = useAppSelector(selectFetchingNoteStatus);
+  const { layout } = useAppSelector(selectSetting);
 
   useEffect(() => {
     if (!loading && errors.length > 0) {
@@ -30,33 +33,29 @@ function App(): JSX.Element {
           el.blur();
           el.value = '';
         }
-        
+
         hideApp();
       }
     };
   }, []);
 
   return (
-    <div className="flex h-screen w-screen flex-col gap-4 overflow-y-hidden p-5">
-      <div className="flex flex-grow flex-col justify-end gap-2 overflow-hidden">
-        <div className="flex flex-none justify-between gap-2">
-          <div className="flex gap-2">
-            <div className="flex items-center gap-2 rounded-md bg-white p-1 pr-2">
-              <h1>🫤</h1>
-              <h1 className="text-sm font-semibold">Default</h1>
-            </div>
-
-            <div className="flex items-center justify-center gap-2 rounded-md bg-amber-500 p-1">
-              <h1 className="w-6">❤️</h1>
-            </div>
-
-            <div className="flex items-center justify-center gap-2 rounded-md bg-blue-500 p-1">
-              <h1 className="w-6">😎</h1>
-            </div>
-          </div>
+    <div
+      className={
+        'flex h-screen w-screen flex-col gap-4 overflow-y-hidden p-5 ' +
+        (layout === 'center-bottom' ? 'flex-col' : 'flex-col-reverse')
+      }
+    >
+      <div
+        className={
+          'flex flex-grow flex-col justify-end gap-2 overflow-hidden ' +
+          (layout === 'center-bottom' ? 'flex-col' : 'flex-col-reverse')
+        }
+      >
+        <div className={'flex flex-none justify-between gap-2'}>
+          <FolderArea />
           <ActionArea />
         </div>
-
         <TaskArea />
       </div>
 

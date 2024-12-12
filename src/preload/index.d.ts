@@ -9,6 +9,10 @@ declare global {
       hideWindows: () => void;
       showNotif: (payload: INotifPayload) => void;
 
+      setStorage: (key: string, value: object) => Promise<boolean>;
+      getStorage: <T>(key: string) => Promise<T | null>;
+      removeStorage: (key: string) => Promise<boolean>;
+
       onShowWindow: (callback: () => void) => void;
     };
   }

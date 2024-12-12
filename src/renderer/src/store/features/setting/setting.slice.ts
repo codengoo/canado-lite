@@ -1,21 +1,30 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+export type ILayoutType = 'center-bottom' | 'center-top';
 export interface SettingState {
-  layout: 'center-bottom' | 'center-top';
+  layout: ILayoutType;
 }
 
 const initialState: SettingState = {
-  layout: 'center-bottom',
+  layout: 'center-top',
 };
 
 export const settingSlice = createSlice({
   initialState,
   name: 'setting',
-  reducers: {},
-  selectors: {},
+  reducers: {
+    changeLayout: (state, action: PayloadAction<ILayoutType>) => {
+      state.layout = action.payload;
+    },
+  },
+  selectors: {
+    selectSetting: (state) => {
+      return state;
+    },
+  },
 });
 
-export const {} = settingSlice.actions;
-export const {} = settingSlice.selectors;
+export const { changeLayout } = settingSlice.actions;
+export const { selectSetting } = settingSlice.selectors;
 
 export default settingSlice.reducer;

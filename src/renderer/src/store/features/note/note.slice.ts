@@ -20,11 +20,7 @@ const initialState: NoteState = {
 export const noteSlice = createSlice({
   name: 'note',
   initialState,
-  reducers: {
-    // incrementByAmount: (state, action: PayloadAction<number>) => {
-    //   state.value += action.payload
-    // }
-  },
+  reducers: {},
   selectors: {
     selectNotes: (state) => {
       // return state.notes.filter((t) => t.status === ENoteStatus.ON_GOING);

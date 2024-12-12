@@ -3,32 +3,47 @@ import { app, BrowserWindow, globalShortcut, ipcMain, nativeImage, screen, shell
 import { join } from 'path';
 import appIcon from '../../resources/icon.ico?asset';
 import { createNotif, INotifPayload } from './notification';
+import { Storage } from './storage';
 
 var windows: BrowserWindow | null = null;
 
-function calcPos(windows: BrowserWindow) {
+type WindowPositionType = 'center-bottom' | 'center-top';
+
+function calcPos(windows: BrowserWindow, position: WindowPositionType) {
   const primaryScreen = screen.getPrimaryDisplay();
   const { width: screenWidth, height: screenHeight } = primaryScreen.workAreaSize;
 
   const windowWidth = windows.getSize()[0] || 100;
   const windowHeight = windows.getSize()[1] || 100;
 
-  const x = Math.floor((screenWidth - windowWidth) / 2);
-  const y = screenHeight - windowHeight;
+  switch (position) {
+    case 'center-bottom':
+      return {
+        x: Math.floor((screenWidth - windowWidth) / 2),
+        y: screenHeight - windowHeight,
+      };
 
-  return { x, y };
+    case 'center-top':
+      return {
+        x: Math.floor((screenWidth - windowWidth) / 2),
+        y: 0,
+      };
+
+    default:
+      return { x: 0, y: 0 };
+  }
 }
 
 function showWindows(windows: BrowserWindow, first?: boolean) {
+  const { x, y } = calcPos(windows, 'center-top');
+
   if (first) {
-    const { x, y } = calcPos(windows);
     windows.setPosition(x, y);
     windows.show();
   } else if (!windows.isVisible()) {
     windows.show();
 
     setTimeout(() => {
-      const { x, y } = calcPos(windows);
       windows.setPosition(x, y);
       windows.webContents.send('show-win');
     }, 100);
@@ -97,6 +112,7 @@ if (!gotTheLock) {
   });
 
   app.on('ready', () => {
+    Storage.getInstance();
     createWindow();
   });
 
@@ -121,5 +137,20 @@ if (!gotTheLock) {
 
   ipcMain.on('show-notif', (_, payload: INotifPayload) => {
     createNotif(payload);
+  });
+
+  ipcMain.handle('storage:set', (_, key: string, value: object) => {
+    const storage = Storage.getInstance();
+    return storage.setItem(key, value);
+  });
+
+  ipcMain.handle('storage:get', (_, key: string) => {
+    const storage = Storage.getInstance();
+    return storage.getItem(key);
+  });
+
+  ipcMain.handle('storage:remove', (_, key: string) => {
+    const storage = Storage.getInstance();
+    return storage.removeItem(key);
   });
 }

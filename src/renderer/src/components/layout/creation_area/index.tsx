@@ -2,7 +2,7 @@ import { useAppDispatch } from '@/hooks';
 import { createNote } from '@/store/features/note';
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { TbGrain, TbSend2 } from 'react-icons/tb';
-import { BtnIcon } from '../ui';
+import { BtnIcon } from '@/components/ui';
 
 export default function CreationArea() {
   const hideApp = () => window.api.hideWindows();

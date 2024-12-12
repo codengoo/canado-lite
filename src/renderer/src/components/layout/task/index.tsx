@@ -9,7 +9,7 @@ import {
   TbSquareRoundedCheck,
   TbSquareRoundedCheckFilled,
 } from 'react-icons/tb';
-import { BtnIcon } from '../ui';
+import { BtnIcon } from '@/components/ui';
 
 interface ITaskProps {
   data: INote;
