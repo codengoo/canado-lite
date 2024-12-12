@@ -27,6 +27,12 @@ function calcPos(windows: BrowserWindow, position: IWindowPositionType) {
         y: 0,
       };
 
+    case 'center-center':
+      return {
+        x: Math.floor((screenWidth - windowWidth) / 2),
+        y: Math.floor((screenHeight - windowHeight) / 2),
+      };
+
     default:
       return { x: 0, y: 0 };
   }
@@ -48,7 +54,6 @@ async function readLayoutSetting(): Promise<IWindowPositionType> {
 
 async function showWindows(windows: BrowserWindow, first?: boolean) {
   const layout = await readLayoutSetting();
-  console.log(layout);
 
   const { x, y } = calcPos(windows, layout);
 

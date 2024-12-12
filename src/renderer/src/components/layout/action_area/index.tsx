@@ -18,6 +18,9 @@ export default function ActionArea() {
     if (layout === 'center-bottom') {
       dispatch(changeLayout('center-top'));
       window.api.changeLayout('center-top');
+    } else if (layout === 'center-top') {
+      dispatch(changeLayout('center-center'));
+      window.api.changeLayout('center-center');
     } else {
       dispatch(changeLayout('center-bottom'));
       window.api.changeLayout('center-bottom');

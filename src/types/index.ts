@@ -1,1 +1,1 @@
-export type IWindowPositionType = 'center-bottom' | 'center-top';
+export type IWindowPositionType = 'center-bottom' | 'center-top' | 'center-center';

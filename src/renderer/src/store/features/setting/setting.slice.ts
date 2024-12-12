@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-export type ILayoutType = 'center-bottom' | 'center-top';
+export type ILayoutType = 'center-bottom' | 'center-top' | 'center-center';
 export interface SettingState {
   layout: ILayoutType;
 }
