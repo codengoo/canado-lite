@@ -5,24 +5,14 @@ import { TbLoader2 } from 'react-icons/tb';
 import Task from '../task';
 
 export default function TaskArea() {
-  const showNotif = window.api.showNotif;
   const dispatch = useAppDispatch();
   const notes = useAppSelector(selectNotes);
-  const { loading, errors, currentAction } = useAppSelector(selectFetchingNoteStatus);
+  const { loading, currentAction } = useAppSelector(selectFetchingNoteStatus);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     dispatch(fetchNotes());
   }, []);
-
-  useEffect(() => {
-    if (!loading && errors.length > 0) {
-      showNotif({
-        title: errors[0].title,
-        body: errors[0].body,
-      });
-    }
-  }, [loading]);
 
   useEffect(() => {
     containerRef.current?.scrollTo({ left: 0, top: containerRef?.current.scrollHeight, behavior: 'smooth' });

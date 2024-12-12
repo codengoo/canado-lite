@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { noteReducer } from './features/note';
+import { settingReducer } from './features/setting';
 
 export const store = configureStore({
   reducer: {
     note: noteReducer,
+    setting: settingReducer,
   },
 });
 

@@ -46,6 +46,7 @@ export default function CreationArea() {
       <div className="flex flex-grow gap-2 p-4 pl-0">
         <input
           ref={inputRef}
+          id="input_note_title"
           placeholder="Insert task"
           className="no-draggable flex-grow bg-transparent font-semibold outline-none placeholder:font-normal placeholder:text-gray-500"
           onKeyUp={handleKeyUp}

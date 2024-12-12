@@ -6,9 +6,17 @@ interface IBtnIconProps {
   iconClassName?: string;
   onClick?: () => void;
   disable?: boolean;
+  size?: number;
 }
 
-export function BtnIcon({ icon: Icon, className = '', iconClassName = '', onClick, disable }: IBtnIconProps) {
+export function BtnIcon({
+  icon: Icon,
+  className = '',
+  iconClassName = '',
+  onClick,
+  disable,
+  size = 24,
+}: IBtnIconProps) {
   return (
     <button
       disabled={disable}
@@ -19,7 +27,7 @@ export function BtnIcon({ icon: Icon, className = '', iconClassName = '', onClic
       }
       onClick={onClick}
     >
-      <Icon className={'text-gray-600 ' + iconClassName} size={24} />
+      <Icon className={'text-gray-600 ' + iconClassName} size={size} />
     </button>
   );
 }
