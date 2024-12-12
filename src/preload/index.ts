@@ -1,6 +1,6 @@
 import { electronAPI } from '@electron-toolkit/preload';
 import { contextBridge, ipcRenderer } from 'electron';
-import { INotifPayload } from '../main/notification';
+import { INotifPayload } from '../main/modules/notification';
 import { IWindowPositionType } from '../types';
 
 const api = {
@@ -12,6 +12,9 @@ const api = {
   setStorage: (key: string, value: object) => ipcRenderer.invoke('storage:set', key, value),
   getStorage: (key: string) => ipcRenderer.invoke('storage:get', key),
   removeStorage: (key: string) => ipcRenderer.invoke('storage:remove', key),
+
+  regStartup: () => ipcRenderer.invoke('reg-startup'),
+  deregStartup: () => ipcRenderer.invoke('dereg-startup'),
 
   onShowWindow: (callback: () => void) => ipcRenderer.on('show-win', () => callback()),
 };

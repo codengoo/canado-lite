@@ -1,14 +1,14 @@
 import { BtnIcon } from '@/components/ui';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { fetchNotes, selectFetchingNoteStatus } from '@/store/features/note';
-import { changeLayout, selectSetting } from '@/store/features/setting';
-import { TbCircleDashedCheck, TbCircleX, TbLayout, TbRefresh } from 'react-icons/tb';
+import { changeLayout, changeStartUpMode, selectSetting } from '@/store/features/setting';
+import { TbCircleDashedCheck, TbCircleX, TbLayout, TbPointerBolt, TbRefresh } from 'react-icons/tb';
 
 export default function ActionArea() {
   const closeApp = () => window.api.closeWindows();
   const dispatch = useAppDispatch();
   const { loading, currentAction } = useAppSelector(selectFetchingNoteStatus);
-  const { layout } = useAppSelector(selectSetting);
+  const { layout, startUpWithWins } = useAppSelector(selectSetting);
 
   function handleRefresh() {
     dispatch(fetchNotes());
@@ -27,6 +27,16 @@ export default function ActionArea() {
     }
   }
 
+  async function handleChangeStartUpMode() {
+    if (startUpWithWins) {
+      const ok = await window.api.deregStartup();
+      if (ok) dispatch(changeStartUpMode(false));
+    } else {
+      const ok = await window.api.regStartup();
+      if (ok) dispatch(changeStartUpMode(true));
+    }
+  }
+
   return (
     <div className="space-x-2">
       {/* <BtnIcon icon={TbDotsCircleHorizontal} className="bg-slate-100/80 hover:bg-slate-100" /> */}
@@ -39,6 +49,12 @@ export default function ActionArea() {
       />
       <BtnIcon icon={TbCircleDashedCheck} className="bg-slate-100/80 hover:bg-slate-100" size={18} />
       <BtnIcon icon={TbLayout} className="bg-slate-100/80 hover:bg-slate-100" size={18} onClick={handleChangeLayout} />
+      <BtnIcon
+        icon={TbPointerBolt}
+        className="bg-slate-100/80 hover:bg-slate-100"
+        size={18}
+        onClick={handleChangeStartUpMode}
+      />
       {/* <BtnIcon icon={TbSettings} className="bg-slate-100/80 hover:bg-slate-100" /> */}
       <BtnIcon
         icon={TbCircleX}

@@ -3,9 +3,12 @@ import { app, BrowserWindow, globalShortcut, ipcMain, nativeImage, screen, shell
 import { join } from 'path';
 import appIcon from '../../resources/icon.ico?asset';
 import { IWindowPositionType } from '../types';
-import { createNotif, INotifPayload } from './notification';
-import { Storage } from './storage';
+import { Storage } from './modules/storage';
 var windows: BrowserWindow | null = null;
+
+import './ipcs/notif.ipc';
+import './ipcs/register.ipc';
+import './ipcs/storage.ipc';
 
 function calcPos(windows: BrowserWindow, position: IWindowPositionType) {
   const primaryScreen = screen.getPrimaryDisplay();
@@ -155,27 +158,11 @@ if (!gotTheLock) {
     windows?.setPosition(0, -1000);
   });
 
-  ipcMain.on('show-notif', (_, payload: INotifPayload) => {
-    createNotif(payload);
-  });
-
   ipcMain.on('change-layout', (_, payload: IWindowPositionType) => {
     const { x, y } = calcPos(windows!, payload);
     windows?.setPosition(x, y);
   });
 
-  ipcMain.handle('storage:set', (_, key: string, value: object) => {
-    const storage = Storage.getInstance();
-    return storage.setItem(key, value);
-  });
-
-  ipcMain.handle('storage:get', (_, key: string) => {
-    const storage = Storage.getInstance();
-    return storage.getItem(key);
-  });
-
-  ipcMain.handle('storage:remove', (_, key: string) => {
-    const storage = Storage.getInstance();
-    return storage.removeItem(key);
-  });
+  console.log(app.getAppPath());
+  console.log(app.getPath("exe"));
 }

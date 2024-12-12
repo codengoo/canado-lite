@@ -1,5 +1,5 @@
 import { nativeImage, Notification } from 'electron';
-import appIcon from '../../resources/icon.ico?asset';
+import appIcon from '../../../resources/icon.ico?asset';
 
 export interface INotifPayload {
   title: string;

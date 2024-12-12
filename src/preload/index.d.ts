@@ -1,5 +1,5 @@
 import { ElectronAPI } from '@electron-toolkit/preload';
-import { INotifPayload } from '../main/notification';
+import { INotifPayload } from '../main/modules/notification';
 
 declare global {
   interface Window {
@@ -14,6 +14,9 @@ declare global {
       getStorage: <T>(key: string) => Promise<T | null>;
       removeStorage: (key: string) => Promise<boolean>;
 
+      regStartup: () => Promise<boolean>;
+      deregStartup: () => Promise<boolean>;
+      
       onShowWindow: (callback: () => void) => void;
     };
   }
