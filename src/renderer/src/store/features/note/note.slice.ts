@@ -146,7 +146,7 @@ export const noteSlice = createSlice({
       state.loading = false;
       state.currentAction = 'none';
 
-      const msg = action.payload || { title: 'Fetch notes failed', body: action.error.message };
+      const msg = action.payload || { title: 'Update notes failed', body: action.error.message };
       state.errors = [msg as IError];
 
       // Reverse
@@ -179,7 +179,8 @@ export const noteSlice = createSlice({
       state.loading = true;
       state.currentAction = 'create';
       const payload = action.meta.arg;
-      const newNote: INote = adaptNote({ title: payload.title, content: payload.content });
+      const newNote: INote = adaptNote({ title: payload.title, content: payload.content, isLoading: true });
+      console.log(newNote);
 
       state.on_notes = [...state.on_notes, newNote];
     });
@@ -199,7 +200,7 @@ export const noteSlice = createSlice({
       state.loading = false;
       state.currentAction = 'none';
 
-      const msg = action.payload || { title: 'Fetch notes failed', body: action.error.message };
+      const msg = action.payload || { title: 'Create notes failed', body: action.error.message };
       state.errors = [msg as IError];
 
       // const ref = value.ref;

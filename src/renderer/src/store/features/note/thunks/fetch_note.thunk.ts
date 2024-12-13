@@ -13,7 +13,7 @@ export const fetchNotes = createAsyncThunk(
   'note/fetchAll',
   async ({ status, limit = 100, offset = 0 }: IFetchNotePayload, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`/note?status=${status}`);
+      const response = await axios.get(`/note?status=${status || ''}`);
       const res = response.data as IResponseData<INote[]>;
 
       if (res.data) return res.data;

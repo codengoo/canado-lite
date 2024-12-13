@@ -49,19 +49,21 @@ async function readLayoutSetting(): Promise<IWindowPositionType> {
 
 export async function showWindows(windows: BrowserWindow, first?: boolean) {
   const layout = await readLayoutSetting();
+  if (windows.isMinimized()) windows.restore();
+  else {
+    const { x, y } = calcPos(windows, layout);
 
-  const { x, y } = calcPos(windows, layout);
-
-  if (first) {
-    windows.setPosition(x, y);
-    windows.show();
-  } else if (!windows.isVisible()) {
-    windows.show();
-
-    setTimeout(() => {
+    if (first) {
       windows.setPosition(x, y);
-      windows.webContents.send('show-win');
-    }, 100);
+      windows.show();
+    } else if (!windows.isVisible()) {
+      windows.show();
+
+      setTimeout(() => {
+        windows.setPosition(x, y);
+        windows.webContents.send('show-win');
+      }, 100);
+    }
   }
 }
 

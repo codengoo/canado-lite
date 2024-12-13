@@ -10,12 +10,13 @@ export default function TaskArea() {
   const dispatch = useAppDispatch();
   const notes = useAppSelector(selectNotes);
   const { loading, currentAction } = useAppSelector(selectFetchingNoteStatus);
-  const { layout, currentView } = useAppSelector(selectSetting);
+  const { layout } = useAppSelector(selectSetting);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     dispatch(fetchNotes({ status: ENoteStatus.COMPLETED }));
     dispatch(fetchNotes({ status: ENoteStatus.ON_GOING }));
+    dispatch(fetchNotes({ }));
   }, []);
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { ENotePriority, INote } from '@/types';
+import { ENotePriority, ENoteStatus, INote } from '@/types';
 import { v4 as uuid } from 'uuid';
 
 export function adaptNote(note: any): INote {
