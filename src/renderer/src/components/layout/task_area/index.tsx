@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@/hooks';
-import { fetchNotes, selectDoneNotes, selectFetchingNoteStatus, selectNotes } from '@/store/features/note';
+import { fetchNotes, selectFetchingNoteStatus, selectNotes } from '@/store/features/note';
 import { selectSetting } from '@/store/features/setting';
 import { ENoteStatus } from '@/types';
 import { useEffect, useRef } from 'react';
@@ -9,7 +9,6 @@ import Task from './task';
 export default function TaskArea() {
   const dispatch = useAppDispatch();
   const notes = useAppSelector(selectNotes);
-  const done_notes = useAppSelector(selectDoneNotes);
   const { loading, currentAction } = useAppSelector(selectFetchingNoteStatus);
   const { layout, currentView } = useAppSelector(selectSetting);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -33,18 +32,9 @@ export default function TaskArea() {
           <p className="animate-pulse font-semibold text-gray-700">Fetching data from server, please wait...</p>
         </div>
       ) : layout === 'center-bottom' ? (
-        currentView == 'on-going' ? (
-          notes.map((note) => <Task data={note} key={'task_' + note.id} />)
-        ) : (
-          done_notes.map((note) => <Task data={note} key={'task_' + note.id} />)
-        )
-      ) : currentView == 'on-going' ? (
-        notes
-          .slice()
-          .reverse()
-          .map((note) => <Task data={note} key={'task_' + note.id} />)
+        notes.map((note) => <Task data={note} key={'task_' + note.id} />)
       ) : (
-        done_notes
+        notes
           .slice()
           .reverse()
           .map((note) => <Task data={note} key={'task_' + note.id} />)

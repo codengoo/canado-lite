@@ -14,6 +14,7 @@ export default function ActionArea() {
   function handleRefresh() {
     dispatch(fetchNotes({ status: ENoteStatus.ON_GOING }));
     dispatch(fetchNotes({ status: ENoteStatus.COMPLETED }));
+    dispatch(fetchNotes({}));
   }
 
   function handleChangeLayout() {
@@ -65,7 +66,7 @@ export default function ActionArea() {
         className="bg-slate-100/80 hover:bg-slate-100"
         size={18}
         onClick={handleChangeView}
-        tooltip="View finished task"
+        tooltip={currentView}
       />
       <BtnIcon
         icon={TbLayout}

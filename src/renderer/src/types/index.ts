@@ -20,6 +20,7 @@ export interface INote {
   updatedAt?: Date;
   createdAt?: Date;
   isLoading?: boolean;
+  isShow?: boolean;
 }
 
 export interface IResponseData<T = any> {

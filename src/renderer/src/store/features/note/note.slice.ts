@@ -1,7 +1,6 @@
 import { RootState } from '@/store/store';
-import { ENotePriority, ENoteStatus, IError, INote } from '@/types';
+import { ENoteStatus, IError, INote } from '@/types';
 import { createSlice } from '@reduxjs/toolkit';
-import { v4 as uuid } from 'uuid';
 import { createNote, fetchNotes, updateNote } from '.';
 import { adaptNote } from './adapter/notes';
 
@@ -99,50 +98,77 @@ export const noteSlice = createSlice({
         if (idx < 0) return;
 
         state.on_notes[idx].isLoading = true;
-        const tmp = state.on_notes[idx];
-
-        state.comp_notes.push(tmp);
-        state.on_notes.splice(idx, 1);
+        state.on_notes[idx].isShow = false;
       } else if (status && status == ENoteStatus.ON_GOING) {
         const idx = state.comp_notes.findLastIndex((note) => note.id == ref);
         if (idx < 0) return;
 
         state.comp_notes[idx].isLoading = true;
-        const tmp = state.comp_notes[idx];
-
-        state.on_notes.push(tmp);
-        state.comp_notes.splice(idx, 1);
+        state.comp_notes[idx].isShow = false;
       } else {
         // const idx = state.on_notes.findLastIndex((note) => note.id == ref);
         // if (idx < 0) return;
       }
     });
+
     builder.addCase(updateNote.fulfilled, (state, action) => {
       state.loading = false;
       state.currentAction = 'none';
       const value = action.payload;
       const ref = value.id;
-      const idx = state.notes.findLastIndex((note) => note.id == ref);
+      const status = action.meta.arg.status;
 
-      if (idx >= 0)
-        state.notes[idx] = {
-          title: value.title,
-          content: value.content,
-          id: value.id,
-          ref: value.ref,
-          // @ts-ignore
-          status: value.state,
-          folderId: '0000',
-          priority: ENotePriority.LOW,
-          isLoading: false,
-        };
+      if (status && status === ENoteStatus.COMPLETED) {
+        var idx = state.comp_notes.findLastIndex((note) => note.id == ref);
+        if (idx < 0) return;
+
+        state.comp_notes.push(state.on_notes[idx]);
+        state.on_notes.splice(idx, 1);
+      } else if (status && status === ENoteStatus.ON_GOING) {
+        var idx = state.comp_notes.findLastIndex((note) => note.id == ref);
+        if (idx < 0) return;
+
+        state.on_notes.push(state.comp_notes[idx]);
+        state.comp_notes.splice(idx, 1);
+      }
+
+      var idx = state.comp_notes.findLastIndex((note) => note.id == ref);
+      if (idx >= 0) state.comp_notes[idx] = adaptNote(value);
+
+      idx = state.on_notes.findLastIndex((note) => note.id == ref);
+      if (idx >= 0) state.on_notes[idx] = adaptNote(value);
+
+      idx = state.all_notes.findLastIndex((note) => note.id == ref);
+      if (idx >= 0) state.all_notes[idx] = adaptNote(value);
     });
+
     builder.addCase(updateNote.rejected, (state, action) => {
       state.loading = false;
       state.currentAction = 'none';
 
       const msg = action.payload || { title: 'Fetch notes failed', body: action.error.message };
       state.errors = [msg as IError];
+
+      // Reverse
+      const ref = action.meta.arg.id;
+      const status = action.meta.arg.status;
+
+      if (status && status == ENoteStatus.COMPLETED) {
+        const idx = state.on_notes.findLastIndex((note) => note.id == ref);
+        if (idx < 0) return;
+
+        state.on_notes[idx].isLoading = false;
+        state.on_notes[idx].isShow = true;
+      } else if (status && status == ENoteStatus.ON_GOING) {
+        const idx = state.comp_notes.findLastIndex((note) => note.id == ref);
+        if (idx < 0) return;
+
+        state.comp_notes[idx].isLoading = true;
+        state.comp_notes[idx].isShow = true;
+      } else {
+        // const idx = state.on_notes.findLastIndex((note) => note.id == ref);
+        // if (idx < 0) return;
+      }
     });
 
     /**
@@ -153,16 +179,7 @@ export const noteSlice = createSlice({
       state.loading = true;
       state.currentAction = 'create';
       const payload = action.meta.arg;
-      const newNote: INote = {
-        title: payload.title,
-        content: payload.content,
-        folderId: '0000',
-        id: '0000',
-        priority: ENotePriority.LOW,
-        ref: uuid(),
-        status: ENoteStatus.ON_GOING,
-        isLoading: true,
-      };
+      const newNote: INote = adaptNote({ title: payload.title, content: payload.content });
 
       state.on_notes = [...state.on_notes, newNote];
     });
@@ -174,20 +191,8 @@ export const noteSlice = createSlice({
       // const ref = value.ref;
       // TODO: Fix later
       // const idx = state.notes.findLastIndex((note) => note.ref == ref);
-      const idx = state.notes.length - 1;
-
-      if (idx >= 0)
-        state.on_notes[idx] = {
-          title: value.title,
-          content: value.content,
-          id: value.id,
-          ref: value.ref,
-          // @ts-ignore
-          status: value.state,
-          folderId: '0000',
-          priority: ENotePriority.LOW,
-          isLoading: false,
-        };
+      const idx = state.on_notes.length - 1;
+      if (idx >= 0) state.on_notes[idx] = adaptNote(value);
     });
 
     builder.addCase(createNote.rejected, (state, action) => {
@@ -201,7 +206,7 @@ export const noteSlice = createSlice({
       // TODO: Fix later
       // const idx = state.notes.findLastIndex((note) => note.ref == ref);
       const idx = state.on_notes.length - 1;
-      if (idx >= 0) state.notes.splice(idx, 1);
+      if (idx >= 0) state.on_notes.splice(idx, 1);
     });
   },
 });
@@ -214,13 +219,13 @@ export const selectNotes = (state: RootState) => {
 
   switch (currentView) {
     case 'all':
-      return state.note.all_notes;
+      return (state.note.all_notes || []).filter((t) => t.isShow);
     case 'completed':
-      return state.note.comp_notes;
+      return (state.note.comp_notes || []).filter((t) => t.isShow);
     case 'on-going':
-      return state.note.on_notes;
+      return (state.note.on_notes || []).filter((t) => t.isShow);
     default:
-      return state.note.on_notes;
+      return (state.note.on_notes || []).filter((t) => t.isShow);
   }
 };
 

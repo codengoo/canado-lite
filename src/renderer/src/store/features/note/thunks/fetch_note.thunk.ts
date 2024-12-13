@@ -11,7 +11,7 @@ interface IFetchNotePayload {
 
 export const fetchNotes = createAsyncThunk(
   'note/fetchAll',
-  async ({ status = ENoteStatus.ON_GOING, limit = 100, offset = 0 }: IFetchNotePayload, { rejectWithValue }) => {
+  async ({ status, limit = 100, offset = 0 }: IFetchNotePayload, { rejectWithValue }) => {
     try {
       const response = await axios.get(`/note?status=${status}`);
       const res = response.data as IResponseData<INote[]>;
