@@ -1,3 +1,4 @@
+import { BtnIcon } from '@/components/ui';
 import { useAppDispatch } from '@/hooks';
 import { updateNote } from '@/store/features/note';
 import { ENotePriority, ENoteStatus, INote } from '@/types';
@@ -8,8 +9,8 @@ import {
   TbLoader2,
   TbSquareRoundedCheck,
   TbSquareRoundedCheckFilled,
+  TbTrash,
 } from 'react-icons/tb';
-import { BtnIcon } from '@/components/ui';
 
 interface ITaskProps {
   data: INote;
@@ -30,7 +31,7 @@ export default function Task({ data }: ITaskProps) {
   return (
     <div
       className={
-        'group flex w-full cursor-pointer items-center gap-4 rounded-lg border-2 border-transparent bg-gray-100/80 p-4 transition-all hover:bg-white hover:shadow-xl ' +
+        'group flex w-full cursor-pointer items-center gap-4 overflow-hidden rounded-lg border-2 border-transparent bg-gray-100/80 p-4 transition-all hover:bg-white hover:shadow-xl ' +
         (data.priority === ENotePriority.LOW
           ? 'hover:hover:border-green-600'
           : data.priority === ENotePriority.HIGH
@@ -50,26 +51,27 @@ export default function Task({ data }: ITaskProps) {
         <BtnIcon icon={TbCircleArrowUpFilled} iconClassName="text-yellow-600" />
       )}
 
-      <div className="flex-grow">
+      <div className="flex-grow overflow-hidden">
         <h1 className="font-semibold">{data.title}</h1>
         <p className="text-sm">{data.content}</p>
       </div>
 
-      {data.status === ENoteStatus.ON_GOING ? (
-        <BtnIcon
-          icon={TbSquareRoundedCheck}
-          className="self-start opacity-0 group-hover:opacity-100"
-          iconClassName="text-gray-400"
-          onClick={() => updateDoneStatus(ENoteStatus.COMPLETED)}
-        />
-      ) : (
-        <BtnIcon
-          icon={TbSquareRoundedCheckFilled}
-          className="self-start opacity-0 group-hover:opacity-100"
-          iconClassName="text-green-600"
-          onClick={() => updateDoneStatus(ENoteStatus.ON_GOING)}
-        />
-      )}
+      <div className="self-start opacity-0 group-hover:opacity-100">
+        {data.status === ENoteStatus.ON_GOING ? (
+          <BtnIcon
+            icon={TbSquareRoundedCheck}
+            iconClassName="text-gray-400"
+            onClick={() => updateDoneStatus(ENoteStatus.COMPLETED)}
+          />
+        ) : (
+          <BtnIcon
+            icon={TbSquareRoundedCheckFilled}
+            iconClassName="text-green-600"
+            onClick={() => updateDoneStatus(ENoteStatus.ON_GOING)}
+          />
+        )}
+        <BtnIcon icon={TbTrash} />
+      </div>
     </div>
   );
 }

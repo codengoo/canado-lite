@@ -1,5 +1,5 @@
 import { RootState } from '@/store/store';
-import { ENoteStatus, IError, INote } from '@/types';
+import { ENoteStatus, IActionType, IError, INote } from '@/types';
 import { createSlice } from '@reduxjs/toolkit';
 import { createNote, fetchNotes, updateNote } from '.';
 import { adaptNote } from './adapter/notes';
@@ -10,7 +10,7 @@ export interface NoteState {
   all_notes: INote[];
   on_notes: INote[];
   loading: boolean;
-  currentAction: 'create' | 'fetch' | 'update' | 'none';
+  currentAction: IActionType;
   errors: IError[];
 }
 

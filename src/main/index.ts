@@ -1,6 +1,6 @@
 import { is, optimizer } from '@electron-toolkit/utils';
 import { app, BrowserWindow, globalShortcut, ipcMain, nativeImage, shell } from 'electron';
-import { join } from 'path';
+import { join, resolve } from 'node:path';
 import appIcon from '../../resources/icon.ico?asset';
 import { IWindowPositionType } from '../types';
 import { Storage } from './modules/storage';
@@ -15,6 +15,14 @@ import './ipcs/storage.ipc';
 
 import { calcPos, showWindows } from './modules';
 import { createTrayInstance } from './modules/tray';
+
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient('canado', process.execPath, [resolve(process.argv[1])]);
+  }
+} else {
+  app.setAsDefaultProtocolClient('canado');
+}
 
 function createOptionWin(): void {
   if (optionWin) {
@@ -76,10 +84,6 @@ function createMainWin(): void {
     showWindows(mainWin!, true);
   });
 
-  globalShortcut.register('CmdOrCtrl+Alt+Z', () => {
-    showWindows(mainWin!);
-  });
-
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWin.loadURL(process.env['ELECTRON_RENDERER_URL'] + '/option');
   } else {
@@ -95,7 +99,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('will-quit', () => {
-  globalShortcut.unregisterAll();
+  // globalShortcut.unregisterAll();
 });
 
 const gotTheLock = app.requestSingleInstanceLock();
@@ -112,12 +116,18 @@ if (!gotTheLock) {
       if (mainWin.isMinimized()) mainWin.restore();
       mainWin.focus();
     }
+
+    console.log(argv, workingDir, props);
   });
 
   app.on('ready', () => {
     Storage.getInstance();
     createMainWin();
     createTrayInstance(mainWin!);
+
+    globalShortcut.register('CmdOrCtrl+Alt+Z', () => {
+      showWindows(mainWin!);
+    });
   });
 
   app.on('activate', () => {

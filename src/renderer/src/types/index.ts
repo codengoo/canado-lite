@@ -9,6 +9,13 @@ export enum ENotePriority {
   HIGH = 'HIGH',
 }
 
+export type IActionType = 'create' | 'fetch' | 'update' | 'none';
+
+export interface IError {
+  title: string;
+  body: string;
+}
+
 export interface INote {
   content: string;
   id: string;
@@ -36,9 +43,19 @@ export interface IUser {
   email: string;
   displayName: string;
   avatar: string;
+  updatedAt?: Date;
+  createdAt?: Date;
 }
 
-export interface IError{
-  title: string,
-  body: string
+export interface IFolder {
+  id: string;
+  done: number;
+  ref: string;
+  color: string;
+  total: number;
+  icon: string;
+  updatedAt?: Date;
+  createdAt?: Date;
+  isLoading?: boolean;
+  isShow?: boolean;
 }

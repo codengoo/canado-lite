@@ -6,13 +6,11 @@ export interface SettingState {
   layout: ILayoutType;
   startUpWithWins: boolean;
   currentView: IViewType;
-  currentFolder: string;
 }
 
 const initialState: SettingState = {
   layout: 'center-top',
   startUpWithWins: false,
-  currentFolder: '00000',
   currentView: 'on-going',
 };
 

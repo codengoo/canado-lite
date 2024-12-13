@@ -10,7 +10,7 @@ interface IFetchNotePayload {
 }
 
 export const fetchNotes = createAsyncThunk(
-  'note/fetchAll',
+  'note/fetchNote',
   async ({ status, limit = 100, offset = 0 }: IFetchNotePayload, { rejectWithValue }) => {
     try {
       const response = await axios.get(`/note?status=${status || ''}`);
