@@ -1,17 +1,19 @@
 import { BtnIcon } from '@/components/ui';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { fetchNotes, selectFetchingNoteStatus } from '@/store/features/note';
-import { changeLayout, changeStartUpMode, selectSetting } from '@/store/features/setting';
+import { changeCurrentView, changeLayout, changeStartUpMode, selectSetting } from '@/store/features/setting';
+import { ENoteStatus } from '@/types';
 import { TbCircleDashedCheck, TbCircleX, TbLayout, TbPointerBolt, TbRefresh } from 'react-icons/tb';
 
 export default function ActionArea() {
   const closeApp = () => window.api.closeWindows();
   const dispatch = useAppDispatch();
   const { loading, currentAction } = useAppSelector(selectFetchingNoteStatus);
-  const { layout, startUpWithWins } = useAppSelector(selectSetting);
+  const { layout, startUpWithWins, currentView } = useAppSelector(selectSetting);
 
   function handleRefresh() {
-    dispatch(fetchNotes());
+    dispatch(fetchNotes({ status: ENoteStatus.ON_GOING }));
+    dispatch(fetchNotes({ status: ENoteStatus.COMPLETED }));
   }
 
   function handleChangeLayout() {
@@ -37,6 +39,16 @@ export default function ActionArea() {
     }
   }
 
+  async function handleChangeView() {
+    if (currentView === 'on-going') {
+      dispatch(changeCurrentView('completed'));
+    } else if (currentView === 'completed') {
+      dispatch(changeCurrentView('all'));
+    } else {
+      dispatch(changeCurrentView('on-going'));
+    }
+  }
+
   return (
     <div className="space-x-2">
       {/* <BtnIcon icon={TbDotsCircleHorizontal} className="bg-slate-100/80 hover:bg-slate-100" /> */}
@@ -52,6 +64,7 @@ export default function ActionArea() {
         icon={TbCircleDashedCheck}
         className="bg-slate-100/80 hover:bg-slate-100"
         size={18}
+        onClick={handleChangeView}
         tooltip="View finished task"
       />
       <BtnIcon

@@ -1,19 +1,22 @@
 import { useAppDispatch, useAppSelector } from '@/hooks';
-import { fetchNotes, selectFetchingNoteStatus, selectNotes } from '@/store/features/note';
+import { fetchNotes, selectDoneNotes, selectFetchingNoteStatus, selectNotes } from '@/store/features/note';
 import { selectSetting } from '@/store/features/setting';
+import { ENoteStatus } from '@/types';
 import { useEffect, useRef } from 'react';
 import { TbLoader2 } from 'react-icons/tb';
-import Task from '../task';
+import Task from './task';
 
 export default function TaskArea() {
   const dispatch = useAppDispatch();
   const notes = useAppSelector(selectNotes);
+  const done_notes = useAppSelector(selectDoneNotes);
   const { loading, currentAction } = useAppSelector(selectFetchingNoteStatus);
-  const { layout } = useAppSelector(selectSetting);
+  const { layout, currentView } = useAppSelector(selectSetting);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    dispatch(fetchNotes());
+    dispatch(fetchNotes({ status: ENoteStatus.COMPLETED }));
+    dispatch(fetchNotes({ status: ENoteStatus.ON_GOING }));
   }, []);
 
   useEffect(() => {
@@ -30,9 +33,18 @@ export default function TaskArea() {
           <p className="animate-pulse font-semibold text-gray-700">Fetching data from server, please wait...</p>
         </div>
       ) : layout === 'center-bottom' ? (
-        notes.map((note) => <Task data={note} key={'task_' + note.id} />)
-      ) : (
+        currentView == 'on-going' ? (
+          notes.map((note) => <Task data={note} key={'task_' + note.id} />)
+        ) : (
+          done_notes.map((note) => <Task data={note} key={'task_' + note.id} />)
+        )
+      ) : currentView == 'on-going' ? (
         notes
+          .slice()
+          .reverse()
+          .map((note) => <Task data={note} key={'task_' + note.id} />)
+      ) : (
+        done_notes
           .slice()
           .reverse()
           .map((note) => <Task data={note} key={'task_' + note.id} />)

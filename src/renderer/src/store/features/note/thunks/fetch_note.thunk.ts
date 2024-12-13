@@ -3,23 +3,32 @@ import { axios } from '@/utils';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { AxiosError } from 'axios';
 
-export const fetchNotes = createAsyncThunk('note/fetchAll', async (_, { rejectWithValue }) => {
-  try {
-    const response = await axios.get(`/note?status=${ENoteStatus.ON_GOING}`);
-    const res = response.data as IResponseData<INote[]>;
+interface IFetchNotePayload {
+  status?: ENoteStatus;
+  limit?: number;
+  offset?: number;
+}
 
-    if (res.data) return res.data;
-    else return [];
-  } catch (error) {
-    if (error instanceof AxiosError || error instanceof Error) {
-      return rejectWithValue({
-        title: 'Cannot fetch notes',
-        body: error.message,
-      });
-    } else
-      return rejectWithValue({
-        title: 'Cannot fetch notes',
-        bode: 'Unknown error',
-      });
-  }
-});
+export const fetchNotes = createAsyncThunk(
+  'note/fetchAll',
+  async ({ status = ENoteStatus.ON_GOING, limit = 100, offset = 0 }: IFetchNotePayload, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`/note?status=${status}`);
+      const res = response.data as IResponseData<INote[]>;
+
+      if (res.data) return res.data;
+      else return [];
+    } catch (error) {
+      if (error instanceof AxiosError || error instanceof Error) {
+        return rejectWithValue({
+          title: 'Cannot fetch notes',
+          body: error.message,
+        });
+      } else
+        return rejectWithValue({
+          title: 'Cannot fetch notes',
+          bode: 'Unknown error',
+        });
+    }
+  },
+);

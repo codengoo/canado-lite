@@ -1,10 +1,15 @@
+import { RootState } from '@/store/store';
 import { ENotePriority, ENoteStatus, IError, INote } from '@/types';
 import { createSlice } from '@reduxjs/toolkit';
 import { v4 as uuid } from 'uuid';
 import { createNote, fetchNotes, updateNote } from '.';
+import { adaptNote } from './adapter/notes';
 
 export interface NoteState {
   notes: INote[];
+  comp_notes: INote[];
+  all_notes: INote[];
+  on_notes: INote[];
   loading: boolean;
   currentAction: 'create' | 'fetch' | 'update' | 'none';
   errors: IError[];
@@ -12,6 +17,9 @@ export interface NoteState {
 
 const initialState: NoteState = {
   notes: [],
+  on_notes: [],
+  all_notes: [],
+  comp_notes: [],
   loading: false,
   currentAction: 'none',
   errors: [],
@@ -23,8 +31,7 @@ export const noteSlice = createSlice({
   reducers: {},
   selectors: {
     selectNotes: (state) => {
-      // return state.notes.filter((t) => t.status === ENoteStatus.ON_GOING);
-      return state.notes;
+      return state.notes || [];
     },
 
     selectFetchingNoteStatus: (state) => ({
@@ -40,28 +47,32 @@ export const noteSlice = createSlice({
      *
      */
 
-    builder.addCase(fetchNotes.pending, (state) => {
+    builder.addCase(fetchNotes.pending, (state, action) => {
       state.loading = true;
       state.errors = [];
       state.currentAction = 'fetch';
     });
+
     builder.addCase(fetchNotes.fulfilled, (state, action) => {
       state.loading = false;
       state.errors = [];
       state.currentAction = 'none';
 
-      // Fix later
-      state.notes = action.payload.map((value) => ({
-        title: value.title,
-        content: value.content,
-        id: value.id,
-        ref: value.ref,
-        // @ts-ignore
-        status: value.state,
-        folderId: '0000',
-        priority: ENotePriority.LOW,
-      }));
+      const status = action.meta.arg.status;
+
+      switch (status) {
+        case ENoteStatus.COMPLETED:
+          state.comp_notes = action.payload.map((value) => adaptNote(value));
+          break;
+        case ENoteStatus.ON_GOING:
+          state.on_notes = action.payload.map((value) => adaptNote(value));
+          break;
+        default:
+          state.all_notes = action.payload.map((value) => adaptNote(value));
+          break;
+      }
     });
+
     builder.addCase(fetchNotes.rejected, (state, action) => {
       state.loading = false;
       state.currentAction = 'none';
@@ -81,8 +92,30 @@ export const noteSlice = createSlice({
       state.currentAction = 'update';
 
       const ref = action.meta.arg.id;
-      const idx = state.notes.findLastIndex((note) => note.id == ref);
-      if (idx >= 0) state.notes[idx].isLoading = true;
+      const status = action.meta.arg.status;
+
+      if (status && status == ENoteStatus.COMPLETED) {
+        const idx = state.on_notes.findLastIndex((note) => note.id == ref);
+        if (idx < 0) return;
+
+        state.on_notes[idx].isLoading = true;
+        const tmp = state.on_notes[idx];
+
+        state.comp_notes.push(tmp);
+        state.on_notes.splice(idx, 1);
+      } else if (status && status == ENoteStatus.ON_GOING) {
+        const idx = state.comp_notes.findLastIndex((note) => note.id == ref);
+        if (idx < 0) return;
+
+        state.comp_notes[idx].isLoading = true;
+        const tmp = state.comp_notes[idx];
+
+        state.on_notes.push(tmp);
+        state.comp_notes.splice(idx, 1);
+      } else {
+        // const idx = state.on_notes.findLastIndex((note) => note.id == ref);
+        // if (idx < 0) return;
+      }
     });
     builder.addCase(updateNote.fulfilled, (state, action) => {
       state.loading = false;
@@ -103,8 +136,6 @@ export const noteSlice = createSlice({
           priority: ENotePriority.LOW,
           isLoading: false,
         };
-
-      console.log(state.notes[idx]);
     });
     builder.addCase(updateNote.rejected, (state, action) => {
       state.loading = false;
@@ -133,8 +164,9 @@ export const noteSlice = createSlice({
         isLoading: true,
       };
 
-      state.notes = [...state.notes, newNote];
+      state.on_notes = [...state.on_notes, newNote];
     });
+
     builder.addCase(createNote.fulfilled, (state, action) => {
       state.loading = false;
       state.currentAction = 'none';
@@ -145,7 +177,7 @@ export const noteSlice = createSlice({
       const idx = state.notes.length - 1;
 
       if (idx >= 0)
-        state.notes[idx] = {
+        state.on_notes[idx] = {
           title: value.title,
           content: value.content,
           id: value.id,
@@ -157,6 +189,7 @@ export const noteSlice = createSlice({
           isLoading: false,
         };
     });
+
     builder.addCase(createNote.rejected, (state, action) => {
       state.loading = false;
       state.currentAction = 'none';
@@ -167,13 +200,28 @@ export const noteSlice = createSlice({
       // const ref = value.ref;
       // TODO: Fix later
       // const idx = state.notes.findLastIndex((note) => note.ref == ref);
-      const idx = state.notes.length - 1;
+      const idx = state.on_notes.length - 1;
       if (idx >= 0) state.notes.splice(idx, 1);
     });
   },
 });
 
 export const {} = noteSlice.actions;
-export const { selectFetchingNoteStatus, selectNotes } = noteSlice.selectors;
+export const { selectFetchingNoteStatus } = noteSlice.selectors;
+
+export const selectNotes = (state: RootState) => {
+  const currentView = state.setting.currentView;
+
+  switch (currentView) {
+    case 'all':
+      return state.note.all_notes;
+    case 'completed':
+      return state.note.comp_notes;
+    case 'on-going':
+      return state.note.on_notes;
+    default:
+      return state.note.on_notes;
+  }
+};
 
 export default noteSlice.reducer;
