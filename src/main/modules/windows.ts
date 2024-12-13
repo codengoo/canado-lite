@@ -47,8 +47,8 @@ async function readLayoutSetting(): Promise<IWindowPositionType> {
   }
 }
 
-export async function showWindows(windows: BrowserWindow, first?: boolean) {
-  const layout = await readLayoutSetting();
+export async function showWindows(windows: BrowserWindow, first?: boolean, position?: IWindowPositionType) {
+  const layout = position ? position : await readLayoutSetting();
   if (windows.isMinimized()) windows.restore();
   else {
     const { x, y } = calcPos(windows, layout);

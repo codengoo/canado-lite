@@ -7,6 +7,7 @@ declare global {
     api: {
       closeWindows: () => void;
       hideWindows: () => void;
+      showOption: () => void;
       showNotif: (payload: INotifPayload) => void;
       changeLayout: (payload: WindowPositionType) => void;
 
@@ -16,7 +17,7 @@ declare global {
 
       regStartup: () => Promise<boolean>;
       deregStartup: () => Promise<boolean>;
-      
+
       onShowWindow: (callback: () => void) => void;
     };
   }

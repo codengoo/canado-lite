@@ -6,6 +6,7 @@ import { IWindowPositionType } from '../types';
 const api = {
   closeWindows: () => ipcRenderer.send('close-win'),
   hideWindows: () => ipcRenderer.send('hide-win'),
+  showOption: () => ipcRenderer.send('show-option'),
   showNotif: (payload: INotifPayload) => ipcRenderer.send('show-notif', payload),
   changeLayout: (payload: IWindowPositionType) => ipcRenderer.send('change-layout', payload),
 
